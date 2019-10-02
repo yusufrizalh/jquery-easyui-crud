@@ -32,11 +32,127 @@
             </tr>
         </thead>
     </table>
+
     <div id="toolbar">
-        <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newSubs()">New Subscriber</a>
-        <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editSubs()">Edit Subscriber</a>
-        <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="removeSubs()">Remove Subscriber</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newSubs()">New
+            Subscriber</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
+            onclick="editSubs()">Edit Subscriber</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+            onclick="removeSubs()">Remove Subscriber</a>
     </div>
+
+    <!-- membuat form isian -->
+    <div id="dlg" class="easyui-dialog" style="width: 500px; height: 320px; padding: 10px 20px" closed="true"
+        buttons="#dlg-buttons">
+        <div class="ftitle">Subscriber Information</div>
+        <form id="fm" method="POST" novalidate>
+            <div class="fitem">
+                <label>Firstname</label>
+                <input name="firstname" class="easyui-textbox" required>
+            </div>
+            <div class="fitem">
+                <label>Lastname</label>
+                <input name="lastname" class="easyui-textbox" required>
+            </div>
+            <div class="fitem">
+                <label>Phone</label>
+                <input name="phone" class="easyui-textbox" required>
+            </div>
+            <div class="fitem">
+                <label>Email</label>
+                <input validType="email" name="email" class="easyui-textbox" required>
+            </div>
+        </form>
+    </div>
+    <!-- tombol simpan dalam form -->
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveSubs()"
+            style="width: 90px;">Simpan</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
+            onclick="javascript:$('#dlg').dialog('close')" style="width: 90px;">Batal</a>
+    </div>
+
+    <script type="text/javascript">
+        // perintah untuk CRUD
+        // perintah menambah subscriber baru
+        var url;
+        function newSubs() {
+            $('#dlg').dialog('open').dialog('setTitle', 'New Subscriber');
+            $('#fm').form('clear');
+            url = 'save_subscriber.php';
+        }
+
+        // perintah mengubah isi subscriber
+        function editSubs() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $('#dlg').dialog('open').dialog('setTitle', 'Ubah Subscriber');
+                $('#fm').form('load', row);
+                url = 'update_subscriber.php?id=' + row.id;
+            }
+        }
+
+        // perintah menghapus isi subscriber
+        function removeSubs() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $.messager.confirm('Konfirmasi', 'Apakah yakin menghapus?',
+                    function (r) {
+                        if (r) {
+                            $.post('remove_subscriber.php',
+                                { id: row.id }, function (result) {
+                                    if (result.success) {
+                                        $('#dg').datagrid('reload');
+                                    } else {
+                                        $.messager.show({
+                                            title: 'Error!',
+                                            msg: result.errorMsg
+                                        });
+                                    }
+                                }, 'json');
+                        }
+                    });
+            }
+        }
+
+    </script>
+
+    <style type="text/css">
+        #fm {
+            margin: 0;
+            padding: 10px 30px;
+        }
+
+        .ftitle {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .fitem {
+            margin-bottom: 5px;
+        }
+
+        .fitem label {
+            display: inline-block;
+            width: 120px;
+        }
+
+        .fitem input {
+            width: 240px;
+        }
+    </style>
+
+    <!-- 
+        membuat 3 file php untuk
+        1) save_subscriber.php
+        2) update_subscriber.php?id=
+        3) remove_subscriber.php
+     -->
+
 </body>
 
 </html>
